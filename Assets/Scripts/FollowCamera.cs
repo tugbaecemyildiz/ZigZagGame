@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class FollowCamera : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] GameObject target;
+    Vector3 distance;
+    private void Start()
     {
-        
+        distance = transform.position - target.transform.position; //Kamera ile player arasındaki mesafe
+    }
+    private void LateUpdate()
+    {
+        transform.position = target.transform.position + distance;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-}
+}//class
