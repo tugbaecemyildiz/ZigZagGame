@@ -367,6 +367,7 @@ MonoBehaviour:
   speed: 1.3
   groundSpawner: {fileID: 1994187350}
   hizlanmaZorlugu: 0.02
+  scoreText: {fileID: 1082892522}
 --- !u!54 &672471085
 Rigidbody:
   m_ObjectHideFlags: 0
