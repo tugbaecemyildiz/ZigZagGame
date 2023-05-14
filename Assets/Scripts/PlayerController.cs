@@ -7,8 +7,9 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Out Component")]
     [SerializeField] float speed;
-    [SerializeField] Text scoreText,bestScoreText;
-    [SerializeField] GameObject restartPanel,playGamePanel;
+    [SerializeField] Text scoreText, bestScoreText;
+    [SerializeField] GameObject restartPanel, playGamePanel;
+    [SerializeField] GameObject tebrikMesaj;
 
     [Header("Public Variable")]
     public GroundSpawner groundSpawner;
@@ -19,7 +20,9 @@ public class PlayerController : MonoBehaviour
     Vector3 yon = Vector3.left;
     int bestScore = 0;
     float score = 0f;
+    int sonScoreKontrol = 0;
     float artisMiktari = 1f;
+    bool bestGectiMi = false;
 
 
     private void Start()
@@ -30,7 +33,7 @@ public class PlayerController : MonoBehaviour
             playGamePanel.SetActive(false);
         }
         bestScore = PlayerPrefs.GetInt("BestScore");
-        bestScoreText.text = "Best: "+ bestScore.ToString();
+        bestScoreText.text = "Best: " + bestScore.ToString();
     }
     private void Update()
     {
@@ -40,7 +43,7 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetMouseButtonDown(0))
         {
-            if (yon.x==0) //z ekseninde hareket ediyor demektir
+            if (yon.x == 0) //z ekseninde hareket ediyor demektir
             {
                 yon = Vector3.left;
             }
@@ -49,16 +52,24 @@ public class PlayerController : MonoBehaviour
                 yon = Vector3.back;
             }
         }
-        if (transform.position.y<0.1f)
+        if (transform.position.y < 0.1f)
         {
             isDead = true;
-            if (bestScore<score)
+            if (bestScore < score)
             {
-                bestScore = (int) score;
+                bestGectiMi = true;
+                bestScore = (int)score;
                 PlayerPrefs.SetInt("BestScore", bestScore);
             }
             restartPanel.SetActive(true);
-            Destroy(this.gameObject, 3f);
+            Destroy(gameObject, 3f);
+        }
+
+        if ((int)score / 30 > sonScoreKontrol && (int)score != 0 && bestScore != 0) // 30'a bölümünden kalan 0'sa
+        {
+            speed += 0.3f;
+            artisMiktari += 0.2f;
+            sonScoreKontrol++;
         }
     }
     private void FixedUpdate()
@@ -67,14 +78,26 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-        
+
         Vector3 hareket = yon * speed * Time.deltaTime; //objemizin hareket değeri
-        speed += Time.deltaTime * hizlanmaZorlugu;
         transform.position += hareket; //hareket değerini sürekli pozisyonuma ekle
 
-        score += artisMiktari * speed * Time.deltaTime;
-        
-        scoreText.text = "Score: "+((int)score).ToString();
+        //speed += Time.deltaTime * hizlanmaZorlugu;
+        //score += artisMiktari * speed * Time.deltaTime;
+    }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Altin"))
+        {
+            Destroy(other.gameObject);
+            score += 1;
+            scoreText.text = "Score: " + ((int)score).ToString();
+            if (score > bestScore && !bestGectiMi)
+            {
+                bestGectiMi = true;
+                tebrikMesaj.SetActive(true);
+            }
+        }
     }
     private void OnCollisionExit(Collision collision)
     {
